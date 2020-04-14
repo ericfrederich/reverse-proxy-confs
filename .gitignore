@@ -8,3 +8,5 @@
 !.gitignore
 !LICENSE
 !README.md
+!generate.py
+!simple.yaml

@@ -1,0 +1,180 @@
+template: |-
+  {notes}
+
+  server {{
+      listen 443 ssl;
+      listen [::]:443 ssl;
+
+      server_name {server_name}.*;
+
+      include /config/nginx/ssl.conf;
+
+      client_max_body_size 0;
+
+      # enable for ldap auth, fill in ldap details in ldap.conf
+      #include /config/nginx/ldap.conf;
+
+      location / {{
+          # enable the next two lines for http auth
+          #auth_basic "Restricted";
+          #auth_basic_user_file /config/nginx/.htpasswd;
+
+          # enable the next two lines for ldap auth
+          #auth_request /auth;
+          #error_page 401 =200 /login;
+
+          include /config/nginx/proxy.conf;
+          resolver 127.0.0.11 valid=30s;
+          set $upstream_app {upstream_app};
+          set $upstream_port {upstream_port};
+          set $upstream_proto {upstream_proto};
+          proxy_pass $upstream_proto://$upstream_app:$upstream_port;
+
+      }}
+  }}
+
+.notes_template1: &notes_template1 "# make sure that your dns has a cname set for {app_name}"
+.notes_template2: &notes_template2 '# make sure that your dns has a cname set for {app_name} and that your {app_name} container is not using a base url'
+.notes_template3: &notes_template3 '# make sure that your dns has a cname set for {app_name} and that your {app_name} container is named {app_name}'
+
+defaults:
+  upstream_port: 80
+  upstream_proto: http
+  notes: *notes_template1
+  upstream_app: "{app_name}"
+  server_name: "{app_name}"
+
+applications:
+  adguard:
+    notes: *notes_template3
+  airsonic:
+    notes: *notes_template2
+    upstream_port: 4040
+  bazarr:
+    notes: *notes_template2
+    upstream_port: 6767
+  beets:
+    notes: |-
+      #First edit beets.yml and enable the reverse proxy settings, under "web" add "reverse_proxy: true" and restart the beets container.
+      #Make sure that your dns has a cname set for beets and that your beets container is not using a base url
+    upstream_port: 8337
+  booksonic:
+    notes: *notes_template2
+    upstream_port: 4040
+  bookstack:
+    notes: |-
+      # make sure that your dns has a cname set for bookstack and that your bookstack container is named bookstack
+      # Ensure you have the APP_URL Environment Variable set correctly in your Docker Run/Compose or in BookStack Env File (/www/.env)
+      # https://github.com/linuxserver/docker-bookstack#docker
+  codimd:
+    notes: |-
+      # make sure you have added the following environmental variables to your run command/compose file
+      # CMD_DOMAIN=codimd.server.com
+      # CMD_PROTOCOL_USESSL=true
+    upstream_port: 3000
+  couchpotato:
+    notes: *notes_template2
+    upstream_port: 5050
+  deluge:
+    notes: *notes_template2
+    upstream_port: 8112
+  dillinger:
+    upstream_port: 8080
+  dokuwiki:
+    notes: |-
+      # First complete the setup by appending install.php to URL.
+      # Make sure that your dns has a cname set for dokuwiki
+  domoticz:
+    notes: *notes_template2
+    upstream_port: 8080
+  embystat:
+    upstream_port: 6555
+  flood:
+    notes: *notes_template2
+    upstream_port: 3000
+  gitea:
+    notes: |-
+      # make sure that your dns has a cname set for gitea and the following parameters in /data/gitea/conf/app.ini are edited
+      # [server]
+      # SSH_DOMAIN       = gitea.server.com
+      # ROOT_URL         = https://gitea.server.com/
+      # DOMAIN           = gitea.server.com
+    upstream_port: 3000
+  glances:
+    notes: *notes_template2
+    upstream_port: 61208
+  grafana:
+    notes: *notes_template2
+    upstream_port: 3000
+  grocy: {}
+  headphones:
+    upstream_port: 8181
+  heimdall:
+    upstream_port: 443
+    upstream_proto: https
+  kanzi:
+    upstream_port: 8000
+    upstream_proto: https
+  lazylibrarian:
+    upstream_port: 5299
+  lychee: {}
+  monitorr: {}
+  mstream:
+    notes: '# make sure that your dns has a cname set for mstream and your container name is mstream and running using http (default)'
+    upstream_port: 3000
+  mylar:
+    upstream_port: 8090
+  netboot:
+    upstream_port: 3000
+  netdata:
+    upstream_port: 19999
+  osticket:
+    notes: *notes_template3
+  phpmyadmin:
+    notes: *notes_template2
+  piwigo: {}
+  plexwebtools:
+    upstream_port: 33400
+    upstream_app: "plex"
+    notes: *notes_template2
+  prometheus:
+    notes: *notes_template2
+    upstream_port: 9090
+  pydio:
+    notes: *notes_template2
+    upstream_port: 443
+    upstream_proto:  https
+  pyload:
+    notes: *notes_template2
+    upstream_port: 8000
+  quassel-web:
+    notes: |-
+      # make sure that your dns has a cname set for quassel and make sure Quassel-Web is running on http
+      # with -e 'HTTPS'='false' or if you're using -e 'ADVANCED'='true' by editing config.json appropriately
+    server_name: "quassel"
+    upstream_port: 64080
+  raneto:
+    upstream_port: 3000
+  resilio-sync:
+    notes: *notes_template2
+    upstream_port: 8888
+  sickrage:
+    upstream_port: 8081
+  smokeping: {}
+  statping:
+    notes: |-
+      # make sure that your dns has a cname set for statping and that your statping container is not using a base url
+      # If you are using the SSL docker-compose.yml on the statping repo, then the container name will be set to statup.
+      # On other compose examples, it might be named statping. In that case, change $upstream_app statup to $upstream_app statping
+    upstream_app: "statup"
+    upstream_port: 8080
+  syncthing:
+    notes: *notes_template2
+    upstream_port: 8384
+  tdarr:
+    notes: *notes_template2
+    upstream_port: 8265
+  thelounge:
+    upstream_port: 9000
+  znc:
+    upstream_port: 6501
