@@ -1,4 +1,4 @@
-# make sure that your dns has a cname set for osticket and that your osticket container is named osticket.
+# make sure that your dns has a cname set for osticket and that your osticket container is named osticket
 
 server {
     listen 443 ssl;

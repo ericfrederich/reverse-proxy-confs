@@ -1,4 +1,4 @@
-# Make sure that your dns has a cname set for domoticz and that your domoticz container is not using a base url
+# make sure that your dns has a cname set for domoticz and that your domoticz container is not using a base url
 
 server {
     listen 443 ssl;
